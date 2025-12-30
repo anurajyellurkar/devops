@@ -45,11 +45,12 @@ pipeline {
     steps {
         sh """
         cd /var/lib/jenkins/workspace/flight-booking-pipeline/flight_booking_final16
-        docker compose pull
-        docker compose up -d
+        docker-compose pull
+        docker-compose up -d
         """
     }
 }
+
 
     }
 }
