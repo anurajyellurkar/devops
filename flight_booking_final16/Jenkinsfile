@@ -42,19 +42,17 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                sh """
-                # Pull latest image
-                docker pull $IMAGE:latest
+stage('Deploy') {
+    steps {
+        sh """
+        cd /var/lib/jenkins/workspace/flight-booking-pipeline/flight_booking_final16
+        
+        docker-compose down
+        docker-compose pull
+        docker-compose up -d
+        """
+    }
+}
 
-                # Stop old container if running
-                docker rm -f $CONTAINER || true
-
-                # Run container again
-                docker run -d --name $CONTAINER -p 80:80 $IMAGE:latest
-                """
-            }
-        }
     }
 }
