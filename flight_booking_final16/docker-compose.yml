@@ -1,31 +1,12 @@
-version: "3.9"
-
-services:
-  mariadb:
-    image: mariadb:11
-    container_name: mariadb
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: flight_booking
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
-
-  app:
-    image: anuraj2913/flight-booking:latest
-    container_name: flight-booking-app
-    restart: always
-    depends_on:
-      - mariadb
-    ports:
-      - "80:80"
-    environment:
-      DB_HOST: mariadb
-      DB_USER: root
-      DB_PASS: root
-      DB_NAME: flight_booking
-
-volumes:
-  mariadb_data:
+mariadb:
+  image: mariadb:11
+  container_name: mariadb
+  restart: always
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: flight_booking
+  volumes:
+    - mariadb_data:/var/lib/mysql
+    - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  ports:
+    - "3306:3306"
