@@ -2,20 +2,22 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "yourdockerhubusername/flight-booking"
+        IMAGE = "anurajyellurkar/flight-booking"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/<your_repo>.git'
+                git 'https://github.com/anurajyellurkar/devops.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $IMAGE:latest ."
+                dir('flight_booking_final16') {
+                    sh "docker build -t $IMAGE:latest ."
+                }
             }
         }
 
@@ -41,7 +43,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh """
-                cd ~/your-project-folder
+                cd ~/devops/flight_booking_final16
                 docker compose pull
                 docker compose up -d
                 """
@@ -49,4 +51,3 @@ pipeline {
         }
     }
 }
-
