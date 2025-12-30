@@ -1,11 +1,11 @@
 <?php
 // --------------------
-// DATABASE CONNECTION
+// DATABASE CONNECTION (Docker-friendly)
 // --------------------
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "flight_booking";
+$host = getenv('DB_HOST') ?: 'localhost';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') ?: '';
+$db   = getenv('DB_NAME') ?: 'flight_booking';
 
 $conn = new mysqli($host, $user, $pass, $db);
 
@@ -103,14 +103,10 @@ WHERE (p.ticket_no IS NULL OR p.ticket_no = '')
 // --- SEAT SEEDER ---
 $fl = $conn->query("SELECT id FROM flights");
 while ($f = $fl->fetch_assoc()) {
-
     $fid = $f['id'];
-
     for ($r = 1; $r <= 20; $r++) {
         foreach (['A','B','C','D','E','F'] as $c) {
-
             $seat = $c . $r;
-
             $conn->query("
                 INSERT IGNORE INTO seats(flight_id, seat_no, status)
                 VALUES($fid, '$seat', 'FREE')
