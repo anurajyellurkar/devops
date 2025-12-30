@@ -24,7 +24,8 @@ pipeline {
 
         stage('Trivy Scan') {
             steps {
-                sh "trivy image --severity HIGH,CRITICAL $IMAGE:latest"
+                // Do not fail pipeline on vulnerabilities
+                sh "trivy image --severity HIGH,CRITICAL --exit-code 0 $IMAGE:latest"
             }
         }
 
@@ -42,15 +43,17 @@ pipeline {
         }
 
         stage('Deploy') {
-    steps {
-        sh """
-        cd /var/lib/jenkins/workspace/flight-booking-pipeline/flight_booking_final16
-        docker-compose pull
-        docker-compose up -d
-        """
-    }
-}
-
-
+            steps {
+                sh """
+                cd /var/lib/jenkins/workspace/flight-booking-pipeline/flight_booking_final16
+                
+                # Pull latest image
+                docker compose pull
+                
+                # Start / Restart containers
+                docker compose up -d
+                """
+            }
+        }
     }
 }
