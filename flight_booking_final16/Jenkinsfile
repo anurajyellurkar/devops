@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE = "anuraj2913/flight-booking"
+        CONTAINER = "flight-booking-app"
     }
 
     stages {
@@ -24,7 +25,6 @@ pipeline {
 
         stage('Trivy Scan') {
             steps {
-                // Do not fail pipeline on vulnerabilities
                 sh "trivy image --severity HIGH,CRITICAL --exit-code 0 $IMAGE:latest"
             }
         }
@@ -45,13 +45,14 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh """
-                cd /var/lib/jenkins/workspace/flight-booking-pipeline/flight_booking_final16
-                
                 # Pull latest image
-                docker compose pull
-                
-                # Start / Restart containers
-                docker compose up -d
+                docker pull $IMAGE:latest
+
+                # Stop old container if running
+                docker rm -f $CONTAINER || true
+
+                # Run container again
+                docker run -d --name $CONTAINER -p 80:80 $IMAGE:latest
                 """
             }
         }
