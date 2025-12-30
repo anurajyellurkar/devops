@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "anurajyellurkar/flight-booking"
+        IMAGE = "anuraj2913/flight-booking"
     }
 
     stages {
