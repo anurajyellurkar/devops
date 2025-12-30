@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE = "yourdockerhubusername/flight-booking"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/<your_repo>.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t $IMAGE:latest ."
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh "trivy image --severity HIGH,CRITICAL $IMAGE:latest"
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    sh "echo $PASS | docker login -u $USER --password-stdin"
+                    sh "docker push $IMAGE:latest"
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh """
+                cd ~/your-project-folder
+                docker compose pull
+                docker compose up -d
+                """
+            }
+        }
+    }
+}
+
